@@ -24,10 +24,16 @@ menuButton.addEventListener('click', function () {
 })
 */
 
-const getElement = (tagName, classNames) => {
+const getElement = (tagName, classNames, attributes) => {
 	const element = document.createElement(tagName);
 	if (classNames) {
 		element.classList.add(...classNames);
+	}
+	if (attributes){
+		for (const attribute in attributes)
+		{
+			element[attribute] = attributes[attribute];
+		}
 	}
 	return element;
 }
@@ -37,13 +43,28 @@ const createHeader = (param) => {
 	const container = getElement('div', ['container']);
 	const wrapper = getElement('div', ['header'])
 
-	console.log(`Logo: ${param.header.logo}`);
 	if (param.header.logo) {
-		console.log("logo loading");
-		const logo = getElement('img', ['logo']);
-		logo.src = param.header.logo;
-		logo.alt = 'Логотип ' + param.title;
+		const logo = getElement('img', ['logo'], {
+			src: param.header.logo,
+			alt: 'Логотип ' + param.title,
+		});
 		wrapper.append(logo);
+	}
+
+	if (param.header.social) {
+		const socialWrapper = getElement('div', ['social']);
+		console.log(param.header.social);
+		const allSocial = param.header.social.map(item => {
+			const socialLink = getElement('a', ['social-link']);
+			socialLink.append(getElement('img', [], {
+				src: item.image,
+				alt: item.title,
+			}));
+			socialLink.href = item.link;
+			return socialLink;
+		});
+		socialWrapper.append(...allSocial);
+		wrapper.append(socialWrapper);
 	}
 
 	header.append(container);
@@ -66,7 +87,23 @@ const movieConstructor = (selector, options) => {
 movieConstructor('.app',{
 	title: 'Ведьмак',
 	header: {
-		logo: 'witcher/logo.png'
-
+		logo: 'witcher/logo.png',
+		social: [
+			{
+				title: 'Twitter',
+				link: 'https://twitter.com',
+				image: 'witcher/social/twitter.svg',
+			},
+			{
+				title: 'Instagram',
+				link: 'https://instagram.com',
+				image: 'witcher/social/instagram.svg',
+			},
+			{
+				title: 'Facebook',
+				link: 'https://facebook.com',
+				image: 'witcher/social/facebook.svg',
+			}
+		]
 	}
 });
