@@ -38,23 +38,23 @@ const getElement = (tagName, classNames, attributes) => {
 	return element;
 }
 
-const createHeader = (param) => {
-	const header = getElement('header');
+const createHeader = ({title, header, }) => {
+	const headerDiv = getElement('header');
 	const container = getElement('div', ['container']);
 	const wrapper = getElement('div', ['header'])
 
-	if (param.header.logo) {
+	if (header.logo) {
 		const logo = getElement('img', ['logo'], {
-			src: param.header.logo,
-			alt: 'Логотип ' + param.title,
+			src: header.logo,
+			alt: 'Логотип ' + title,
 		});
 		wrapper.append(logo);
 	}
 
 	
-	if (param.header.menu) {
+	if (header.menu) {
 		const menuList = getElement('nav', ['menu-list']);
-		const allMenuLinks = param.header.menu.map(item => {
+		const allMenuLinks = header.menu.map(item => {
 			const menuLink = getElement('a', ['menu-link'], {
 				href: item.link,
 				textContent: item.title,});
@@ -64,9 +64,9 @@ const createHeader = (param) => {
 		wrapper.append(menuList);
 	}
 
-	if (param.header.social) {
+	if (header.social) {
 		const socialWrapper = getElement('div', ['social']);
-		const allSocial = param.header.social.map(item => {
+		const allSocial = header.social.map(item => {
 			const socialLink = getElement('a', ['social-link'], {href: item.link,});
 			socialLink.append(getElement('img', [], {
 				src: item.image,
@@ -78,10 +78,18 @@ const createHeader = (param) => {
 		wrapper.append(socialWrapper);
 	}
 
-	header.append(container);
-	container.append(wrapper);
+	if (header.menu) {
+		const menuButton = getElement('button', ['menu-button']);
+		menuButton.addEventListener('click', function () {
+			menuButton.classList.toggle('menu-button-active');
+			wrapper.classList.toggle('header-active');
+		});
+	}
 
-	return header;
+	headerDiv.append(container);
+	container.append(wrapper, menuButton);
+
+	return headerDiv;
 }
 
 const createMain = ({title, main: {genre, rating, description, trailer}}) => {
@@ -159,8 +167,19 @@ const movieConstructor = (selector, options) => {
 	app.classList.add('body-app');
 	
 	app.style.backgroundImage = options.background ? `url("${options.background}")` : '';
-
+	// Название вкладки
 	document.title = options.title;
+	// Иконка вкалдки
+	if (options.favicon) {
+		const typeOfIcon = options.favicon.substring(options.favicon.lastIndexOf('.')+1);
+		document.head.append(getElement('link',[],
+		{
+			rel: 'icon',
+			href: options.favicon,
+			type: 'image/' + (typeOfIcon === 'svg' ? 'svg-xml' : typeOfIcon),
+		}
+		));
+	}
 
 	if (options.header) {
 		app.append(createHeader(options));
@@ -174,6 +193,7 @@ const movieConstructor = (selector, options) => {
 
 movieConstructor('.app',{
 	title: 'Ведьмак',
+	favicon: '/witcher/logo.png',
 	background: 'witcher/background.jpg',
 	header: {
 		logo: 'witcher/logo.png',
