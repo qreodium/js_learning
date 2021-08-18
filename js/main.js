@@ -62,6 +62,12 @@ const createHeader = ({title, header, }) => {
 		});
 		menuList.append(...allMenuLinks);
 		wrapper.append(menuList);
+		const menuButton = getElement('button', ['menu-button']);
+		menuButton.addEventListener('click', function () {
+			menuButton.classList.toggle('menu-button-active');
+			wrapper.classList.toggle('header-active');
+		});
+		container.append(menuButton);
 	}
 
 	if (header.social) {
@@ -78,21 +84,13 @@ const createHeader = ({title, header, }) => {
 		wrapper.append(socialWrapper);
 	}
 
-	if (header.menu) {
-		const menuButton = getElement('button', ['menu-button']);
-		menuButton.addEventListener('click', function () {
-			menuButton.classList.toggle('menu-button-active');
-			wrapper.classList.toggle('header-active');
-		});
-	}
-
 	headerDiv.append(container);
-	container.append(wrapper, menuButton);
+	container.append(wrapper);
 
 	return headerDiv;
 }
 
-const createMain = ({title, main: {genre, rating, description, trailer}}) => {
+const createMain = ({title, main: {genre, rating, description, trailer, slider}}) => {
 	const main = getElement('main');
 	const container = getElement('div', ['container']);
 	main.append(container);
@@ -158,6 +156,61 @@ const createMain = ({title, main: {genre, rating, description, trailer}}) => {
 		youtubImgLink.append(iconPlay);
 		wrapper.append(youtubImgLink);
 	}
+
+	if (slider) {
+		const sliderBlock = getElement('div', ['series']);
+		const swiperBlock = getElement('div', ['swiper-container']);
+		const swiperWrapper = getElement('div', ['swiper-wrapper']);
+		const arrow = getElement('button', ['arrow']);
+		const slides = slider.map( item => {
+			const swiperSlide = getElement('div', ['swiper-slide']);
+			const card = getElement('figure', ['card']);
+			const cardImg = getElement('img', ['card-img'], {
+				src: item.img,
+				alt: (item.title ? item.title + ' ': '') + (item.subtitle ? item.subtitle : ''),
+			});
+
+			card.append(cardImg);
+			
+			if (item.title || item.subtitle) {
+				const cardDescription = getElement('figcaption', ['card-description']);
+				cardDescription.innerHTML = `
+				${item.subtitle ? `<p class="card-subtitle">${item.subtitle}</p>` : ''}
+				${item.title ? `<p class="card-title">${item.title}</p>` : ''}
+				`;
+				card.append(cardDescription);
+			}
+
+			swiperSlide.append(card);
+			return swiperSlide;
+		});
+
+		swiperWrapper.append(...slides);
+		swiperBlock.append(swiperWrapper);
+		sliderBlock.append(swiperBlock, arrow);
+
+		container.append(sliderBlock);
+
+		new Swiper(swiperBlock, {
+			loop: true,
+			navigation: {
+				nextEl: arrow,
+			},
+			breakpoints: {
+				320: {
+					slidesPerView: 1,
+					spaceBetween: 20
+				},
+				541: {
+					slidesPerView: 2,
+					spaceBetween: 40
+				}
+			}
+		});
+		
+
+	}
+
 	return main;
 }
 
@@ -234,5 +287,27 @@ movieConstructor('.app',{
 		rating: '8',
 		description: 'Ведьмак Геральт, мутант и убийца чудовищ, на своей верной лошади по кличке Плотва путешествует по Континенту. За тугой мешочек чеканных монет этот мужчина избавит вас от всякой настырной нечисти — хоть от чудищ болотных, оборотней и даже заколдованных принцесс.',
 		trailer: 'https://www.youtube.com/watch?v=P0oJqfLzZzQ',
+		slider: [
+			{
+				img: 'witcher/series/series-1.jpg',
+				title: 'Начало конца',
+				subtitle: 'Серия №1',
+			},
+			{
+				img: 'witcher/series/series-2.jpg',
+				title: 'Четыре марки',
+				subtitle: 'Серия №2',
+			},
+			{
+				img: 'witcher/series/series-3.jpg',
+				title: 'Предательская луна',
+				subtitle: 'Серия №3',
+			},
+			{
+				img: 'witcher/series/series-4.jpg',
+				title: 'Банкеты, ублюдки и похороны',
+				subtitle: 'Серия №4',
+			},
+		],
 	}
 });
