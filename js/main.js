@@ -78,11 +78,79 @@ const createHeader = (param) => {
 		wrapper.append(socialWrapper);
 	}
 
-	wrapper.append(getElement('button', ['menu-button']));
 	header.append(container);
 	container.append(wrapper);
 
 	return header;
+}
+
+const createMain = ({title, main: {genre, rating, description, trailer}}) => {
+	const main = getElement('main');
+	const container = getElement('div', ['container']);
+	main.append(container);
+	const wrapper = getElement('div', ['main-content']);
+	container.append(wrapper);
+	const content = getElement('div', ['content']);
+	wrapper.append(content);
+
+	if (genre){
+		const genreSpan = getElement('span', ['genre', 'animated', 'fadeInRight'], {
+			textContent: genre,
+		});
+
+		content.append(genreSpan);
+	}
+
+	if (rating)
+	{
+		const ratingBlock = getElement('div', ['rating', 'animated', 'fadeInRight']);
+		const ratingStars = getElement('div', ['rating-stars']);
+		const ratingNumber = getElement('div', ['rating-number'], {
+			textContent: `${rating}/10`,
+		});
+
+		for (let i = 0; i < 10; i++){
+			const star = getElement('img', ['star'], {
+				alt: i ? '' : `Рейтинг ${rating} из 10`,
+				src: i < rating ? 'img/star.svg' : 'img/star-o.svg',
+			});
+			ratingStars.append(star);
+		}
+
+		ratingBlock.append(ratingStars, ratingNumber);
+		content.append(ratingBlock);
+	}
+
+	content.append(getElement('h1', ['main-title', 'animated', 'fadeInRight'], {textContent: title,}));
+
+	if (description){
+		content.append(getElement('p', ['main-description', 'animated', 'fadeInRight'], {
+			textContent: description,
+		}));
+	}
+
+	if (trailer) {
+		const youtubeLink = getElement('a', ['button', 'animated', 'fadeInRight', 'youtube-modal'], {
+			href: trailer,
+			textContent: 'Смотреть трейлер',
+		});
+
+		const youtubImgLink = getElement('a', ['play', 'youtube-modal'], {
+			href: trailer,
+			ariaLabel: 'Смотреть трейлер',
+		});
+
+		const iconPlay = getElement('img', ['play-img'], {
+			src: 'img/play.svg',
+			ariaHidden: true,
+		});
+
+		
+		content.append(youtubeLink);
+		youtubImgLink.append(iconPlay);
+		wrapper.append(youtubImgLink);
+	}
+	return main;
 }
 
 const movieConstructor = (selector, options) => {
@@ -98,6 +166,9 @@ const movieConstructor = (selector, options) => {
 		app.append(createHeader(options));
 	}
 
+	if (options.main) {
+		app.append(createMain(options));
+	}
 
 }
 
@@ -138,5 +209,10 @@ movieConstructor('.app',{
 			},
 		]
 	},
-
+	main: {
+		genre: '2019, фэнтэзи',
+		rating: '8',
+		description: 'Ведьмак Геральт, мутант и убийца чудовищ, на своей верной лошади по кличке Плотва путешествует по Континенту. За тугой мешочек чеканных монет этот мужчина избавит вас от всякой настырной нечисти — хоть от чудищ болотных, оборотней и даже заколдованных принцесс.',
+		trailer: 'https://www.youtube.com/watch?v=P0oJqfLzZzQ',
+	}
 });
