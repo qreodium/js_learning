@@ -51,22 +51,34 @@ const createHeader = (param) => {
 		wrapper.append(logo);
 	}
 
+	
+	if (param.header.menu) {
+		const menuList = getElement('nav', ['menu-list']);
+		const allMenuLinks = param.header.menu.map(item => {
+			const menuLink = getElement('a', ['menu-link'], {
+				href: item.link,
+				textContent: item.title,});
+			return menuLink;
+		});
+		menuList.append(...allMenuLinks);
+		wrapper.append(menuList);
+	}
+
 	if (param.header.social) {
 		const socialWrapper = getElement('div', ['social']);
-		console.log(param.header.social);
 		const allSocial = param.header.social.map(item => {
-			const socialLink = getElement('a', ['social-link']);
+			const socialLink = getElement('a', ['social-link'], {href: item.link,});
 			socialLink.append(getElement('img', [], {
 				src: item.image,
 				alt: item.title,
 			}));
-			socialLink.href = item.link;
 			return socialLink;
 		});
 		socialWrapper.append(...allSocial);
 		wrapper.append(socialWrapper);
 	}
 
+	wrapper.append(getElement('button', ['menu-button']));
 	header.append(container);
 	container.append(wrapper);
 
@@ -77,15 +89,21 @@ const movieConstructor = (selector, options) => {
 
 	const app = document.querySelector(selector);
 	app.classList.add('body-app');
+	
+	app.style.backgroundImage = options.background ? `url("${options.background}")` : '';
+
+	document.title = options.title;
 
 	if (options.header) {
 		app.append(createHeader(options));
 	}
 
+
 }
 
 movieConstructor('.app',{
 	title: 'Ведьмак',
+	background: 'witcher/background.jpg',
 	header: {
 		logo: 'witcher/logo.png',
 		social: [
@@ -104,6 +122,21 @@ movieConstructor('.app',{
 				link: 'https://facebook.com',
 				image: 'witcher/social/facebook.svg',
 			}
+		],
+		menu: [
+			{
+				title: 'Описание',
+				link: '#',
+			},
+			{
+				title: 'Трейлер',
+				link: '#',
+			},
+			{
+				title: 'Отзывы',
+				link: '#',
+			},
 		]
-	}
+	},
+
 });
